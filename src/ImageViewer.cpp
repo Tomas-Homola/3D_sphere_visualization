@@ -8,6 +8,11 @@ ImageViewer::ImageViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::Imag
 	ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 	getCurrentViewerWidget()->clear();
 
+	QColor c1("#123456"), c2("#654321");
+	QColor c3 = Qt::black;
+	double a = c1.redF() + c2.redF();
+	qDebug() << "a =" << a;
+
 	// settings left
 	ui->pushButton_Clear->setEnabled(false);
 	ui->pushButton_Create->setEnabled(true);
@@ -788,7 +793,6 @@ void ImageViewer::parallelProjection()
 	}
 
 }
-
 void ImageViewer::perspectiveProjection()
 {
 	ViewerWidget* vW = getCurrentViewerWidget();
@@ -908,10 +912,118 @@ void ImageViewer::perspectiveProjection()
 	}
 }
 
+void ImageViewer::calculateColors()
+{
+	Vector L{ 0.0,0.0,0.0 }, R{ 0.0,0.0,0.0 }, V{ 0.0,0.0,0.0 }, N{ 0.0,0.0,0.0 };
+	QList<Vertex*>* vertices = octahedron.pointerVertices();
+	QList<Face*>* faces = octahedron.pointerFaces();
+	Vertex* currentVertex = nullptr;
+	double temp = 0.0, red = 0.0, green = 0.0, blue = 0.0;
+	int intTemp = 0;
+	double h = coeficientsPOM.specular.specularSharpness;
+	QColor I = QColor("#000000");
+	QColor I_L = lightSource.lightColor; // farba svetla
+	QColor I_o = coeficientsPOM.ambient.ambientColor; // farba okolia
+	QColor I_s, I_d, I_a; // jednotlive zlozky
+
+	SpecularComponent r_s = coeficientsPOM.specular; // koeficient odrazu
+	DiffuseComponent r_d = coeficientsPOM.difuse; // koeficient difuzie
+	AmbientComponent r_a = coeficientsPOM.ambient; // ambientny koeficient
+
+	for (int i = 0; i < vertices->size(); i++)
+	{
+		currentVertex = (*vertices)[i];
+
+		// normala
+		N = currentVertex->getVertexNormal();
+		
+		// svetelny luc
+		L.x = lightSource.x - currentVertex->getX();
+		L.y = lightSource.y - currentVertex->getY();
+		L.z = lightSource.z - currentVertex->getZ();
+
+		L = L / norm(L);
+		
+		// odrazeny luc
+		temp = 2.0 * dotProduct(L, N);
+		R = N * temp - L;
+
+		R = R / norm(R);
+
+		if (camera.getProjectionType() == Projection3D::ParallelProjection)
+		{
+			V = camera.getVector_n();
+		}
+		else if (camera.getProjectionType() == Projection3D::PerspectiveProjection)
+		{
+			V = camera.getVector_n() * camera.getCameraDistance();
+			V.x = V.x - currentVertex->getX();
+			V.y = V.y - currentVertex->getY();
+			V.z = V.z - currentVertex->getZ();
+		}
+
+		V = V / norm(V);
+
+		// zrkadlova zlozka
+		if (dotProduct(V, R) <= 0.0)
+			I_s = QColor("#000000");
+		else if (dotProduct(L, N) <= 0.0)
+			I_s = QColor("#000000");
+		else
+		{
+			temp = qPow(dotProduct(V, R), h);
+			red = I_L.redF() * r_s.red * temp;
+			green = I_L.greenF() * r_s.green * temp;
+			blue = I_L.blueF() * r_s.blue * temp;
+
+			I_s.setRedF(red); I_s.setGreenF(green); I_s.setBlueF(blue);
+		}
+
+		// diffuzna zlozka
+		if (dotProduct(L, N) <= 0.0)
+			I_d = QColor("#000000");
+		else
+		{
+			red = I_L.redF() * r_d.red * dotProduct(L, N);
+			green = I_L.greenF() * r_d.green * dotProduct(L, N);
+			blue = I_L.blueF() * r_d.blue * dotProduct(L, N);
+
+			I_d.setRedF(red); I_d.setGreenF(green); I_d.setBlueF(blue);
+		}
+
+		// ambientna zlozka
+		red = I_o.redF() * r_a.red;
+		green = I_o.greenF() * r_a.green;
+		blue = I_o.blueF() * r_a.blue;
+
+		I_a.setRedF(red); I_a.setGreenF(green); I_a.setBlueF(blue);
+
+		// vysledna farba cerveny komponent
+		intTemp = I_s.red() + I_d.red() + I_a.red();
+		if (intTemp < 0)
+			I.setRed(0);
+		else if (intTemp > 255)
+			I.setRed(255);
+		else
+			I.setRed(intTemp);
+
+		// vysledna farba zeleny komponent
+		intTemp = I_s.green() + I_d.green() + I_a.green();
+		if (intTemp < 0)
+			I.setGreen(0);
+		else if (intTemp > 255)
+			I.setGreen(255);
+		else
+			I.setGreen(intTemp);
+	}
+}
+
 void ImageViewer::update3D()
 {
 	if (!octahedron.isEmpty())
 	{
+		octahedron.calculateNormals();
+
 		if (camera.getProjectionType() == Projection3D::ParallelProjection)
 		{
 			parallelProjection();
@@ -1421,17 +1533,14 @@ void ImageViewer::on_doubleSpinBox_LightX_valueChanged(double value)
 {
 	lightSource.x = value;
 }
-
 void ImageViewer::on_doubleSpinBox_LightY_valueChanged(double value)
 {
 	lightSource.y = value;
 }
-
 void ImageViewer::on_doubleSpinBox_LightZ_valueChanged(double value)
 {
 	lightSource.z = value;
 }
-
 void ImageViewer::on_pushButton_LightColor_clicked()
 {
 	QColor chosenColor = QColorDialog::getColor(lightSource.lightColor.name(), this, "Select light source color");
@@ -1449,12 +1558,10 @@ void ImageViewer::on_doubleSpinBox_DiffuseRed_valueChanged(double value)
 {
 	coeficientsPOM.difuse.red = value;
 }
-
 void ImageViewer::on_doubleSpinBox_DiffuseGreen_valueChanged(double value)
 {
 	coeficientsPOM.difuse.green = value;
 }
-
 void ImageViewer::on_doubleSpinBox_DiffuseBlue_valueChanged(double value)
 {
 	coeficientsPOM.difuse.blue = value;
@@ -1464,17 +1571,14 @@ void ImageViewer::on_doubleSpinBox_SpecularRed_valueChanged(double value)
 {
 	coeficientsPOM.specular.red = value;
 }
-
 void ImageViewer::on_doubleSpinBox_SpecularGreen_valueChanged(double value)
 {
 	coeficientsPOM.specular.green = value;
 }
-
 void ImageViewer::on_doubleSpinBox_SpecularBlue_valueChanged(double value)
 {
 	coeficientsPOM.specular.blue = value;
 }
-
 void ImageViewer::on_doubleSpinBox_SpecularSharpness_valueChanged(double value)
 {
 	coeficientsPOM.specular.specularSharpness = value;
@@ -1484,17 +1588,14 @@ void ImageViewer::on_doubleSpinBox_AmbientRed_valueChanged(double value)
 {
 	coeficientsPOM.ambient.red = value;
 }
-
 void ImageViewer::on_doubleSpinBox_AmbientGreen_valueChanged(double value)
 {
 	coeficientsPOM.ambient.green = value;
 }
-
 void ImageViewer::on_doubleSpinBox_AmbientBlue_valueChanged(double value)
 {
 	coeficientsPOM.ambient.blue = value;
 }
-
 void ImageViewer::on_pushButton_AmbientColor_clicked()
 {
 	QColor chosenColor = QColorDialog::getColor(coeficientsPOM.ambient.ambientColor.name(), this, "Select ambient color");

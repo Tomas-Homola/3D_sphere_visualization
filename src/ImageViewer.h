@@ -39,6 +39,7 @@ private:
 
 	void parallelProjection();
 	void perspectiveProjection();
+	void calculateColors();
 	void update3D();
 
 	//ViewerWidget functions

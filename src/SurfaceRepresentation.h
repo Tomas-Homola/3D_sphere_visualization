@@ -82,6 +82,8 @@ public:
 
 	// get functions
 	H_edge* getEdge() { return edge; }
+	Vector getFaceNormal() { return faceNormal; }
+	QColor getFaceColor() { return faceColor; }
 
 	// other
 	QString faceVerticesInfo();
