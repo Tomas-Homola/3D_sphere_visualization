@@ -20,6 +20,7 @@ private:
 	Vector vertexNormal{ DBL_MIN,DBL_MIN,DBL_MIN };
 
 	QColor vertexColor;
+	QPoint projectedPoint;
 
 public:
 	Vertex() {}

@@ -122,10 +122,14 @@ private slots:
 	void on_doubleSpinBox_SpecularBlue_valueChanged(double value);
 	void on_doubleSpinBox_SpecularSharpness_valueChanged(double value);
 
-	//ambient
+	// ambient
 	void on_doubleSpinBox_AmbientRed_valueChanged(double value);
 	void on_doubleSpinBox_AmbientGreen_valueChanged(double value);
 	void on_doubleSpinBox_AmbientBlue_valueChanged(double value);
 	void on_pushButton_AmbientColor_clicked();
+
+	// shading type
+	void on_radioButton_ConstantShading_clicked();
+	void on_radioButton_GouraudShading_clicked();
 
 };

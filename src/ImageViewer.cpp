@@ -8,11 +8,6 @@ ImageViewer::ImageViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::Imag
 	ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 	getCurrentViewerWidget()->clear();
 
-	QColor c1("#123456"), c2("#654321");
-	QColor c3 = Qt::black;
-	double a = c1.redF() + c2.redF();
-	qDebug() << "a =" << a;
-
 	// settings left
 	ui->pushButton_Clear->setEnabled(false);
 	ui->pushButton_Create->setEnabled(true);
@@ -711,6 +706,7 @@ void ImageViewer::parallelProjection()
 	H_edge* edge = nullptr, * edge_next = nullptr, * edge_prev = nullptr;
 
 	QVector<QPointF> newPoints;
+	QList<QColor> colors;
 
 	newPoints.append(QPointF()); newPoints.append(QPointF()); newPoints.append(QPointF());
 
@@ -788,8 +784,14 @@ void ImageViewer::parallelProjection()
 		newPoints[2].setX(x2D * camera.getScaleValue() * objectScale + sX + dx);
 		newPoints[2].setY(y2D * camera.getScaleValue() * objectScale + sY + dy);
 
+		colors.clear();
+		colors.append(edge->getVertexOrigin()->getVertexColor());
+		colors.append(edge_next->getVertexOrigin()->getVertexColor());
+		colors.append(edge_prev->getVertexOrigin()->getVertexColor());
+
 		//vW->createGeometry(newPoints, QColor("#FFFFFF"), QColor("#000000"), 0);
-		vW->drawPolygon(newPoints, QColor("#FFFFFF"));
+		//vW->drawPolygon(newPoints, QColor("#FFFFFF"));
+		vW->drawPolygonT(newPoints, colors, camera.getShadingType());
 	}
 
 }
@@ -978,6 +980,7 @@ void ImageViewer::calculateColors()
 
 			I_s.setRedF(red); I_s.setGreenF(green); I_s.setBlueF(blue);
 		}
+		//qDebug() << "Point\n" << QString("Specular: r=%1 g=%2 b=%3").arg(red).arg(green).arg(blue);
 
 		// diffuzna zlozka
 		if (dotProduct(L, N) <= 0.0)
@@ -991,30 +994,59 @@ void ImageViewer::calculateColors()
 			I_d.setRedF(red); I_d.setGreenF(green); I_d.setBlueF(blue);
 		}
 
+		//qDebug() << QString("Diffuse: r=%1 g=%2 b=%3").arg(red).arg(green).arg(blue);
+
 		// ambientna zlozka
 		red = I_o.redF() * r_a.red;
 		green = I_o.greenF() * r_a.green;
 		blue = I_o.blueF() * r_a.blue;
 
+		//qDebug() << QString("Ambient: r=%1 g=%2 b=%3").arg(red).arg(green).arg(blue) << "\n";
+
 		I_a.setRedF(red); I_a.setGreenF(green); I_a.setBlueF(blue);
 
 		// vysledna farba cerveny komponent
 		intTemp = I_s.red() + I_d.red() + I_a.red();
+		//qDebug() << "I.red=" << intTemp;
 		if (intTemp < 0)
+		{
 			I.setRed(0);
+			//qDebug() << "red < 0";
+		}
 		else if (intTemp > 255)
+		{
 			I.setRed(255);
+			//qDebug() << "red > 255";
+		}
 		else
+		{
+			//qDebug() << "setRed here";
 			I.setRed(intTemp);
+		}
 
 		// vysledna farba zeleny komponent
 		intTemp = I_s.green() + I_d.green() + I_a.green();
+		//qDebug() << "I.green=" << intTemp;
 		if (intTemp < 0)
 			I.setGreen(0);
 		else if (intTemp > 255)
 			I.setGreen(255);
 		else
 			I.setGreen(intTemp);
+
+		// vysledna farba modry komponent
+		intTemp = I_s.blue() + I_d.blue() + I_a.blue();
+		//qDebug() << "I.blue=" << intTemp << "\n";
+		if (intTemp < 0)
+			I.setBlue(0);
+		else if (intTemp > 255)
+			I.setBlue(255);
+		else
+			I.setBlue(intTemp);
+
+		currentVertex->setVertexColor(I);
+
+		//qDebug() << QString("vertex[%1] color:").arg(i) + currentVertex->getVertexColor().name();
 	}
 }
 
@@ -1023,6 +1055,8 @@ void ImageViewer::update3D()
 	if (!octahedron.isEmpty())
 	{
 		octahedron.calculateNormals();
+
+		calculateColors();
 
 		if (camera.getProjectionType() == Projection3D::ParallelProjection)
 		{
@@ -1296,9 +1330,9 @@ void ImageViewer::on_pushButton_Create_clicked()
 	ui->pushButton_Export->setEnabled(true);
 	ui->pushButton_Import->setEnabled(false);
 
-	qDebug() << "Before\nVertices size:" << octahedron.Vertices().size();
-	qDebug() << "Edges size:" << octahedron.Edges().size();
-	qDebug() << "Faces size:" << octahedron.Faces().size();
+	//qDebug() << "Before\nVertices size:" << octahedron.Vertices().size();
+	//qDebug() << "Edges size:" << octahedron.Edges().size();
+	//qDebug() << "Faces size:" << octahedron.Faces().size();
 
 	QList<Vertex*>* vertices = octahedron.pointerVertices();
 	QList<H_edge*>* edges = octahedron.pointerEdges();
@@ -1385,14 +1419,14 @@ void ImageViewer::on_pushButton_Create_clicked()
 	(*edges)[23]->setAll((*vertices)[5], (*faces)[6], (*edges)[19], (*edges)[13], (*edges)[22]); // 5, 6, 19, 13, 22
 
 	qDebug() << "edges done";
-	for (int i = 0; i < edges->size(); i++)
+	/*for (int i = 0; i < edges->size(); i++)
 	{
 		if ((*edges)[i]->hasPair())
 		{
 			qDebug() << QString("edges[%1]:").arg(i) << (*edges)[i]->edgeVerticesInfo();
 			qDebug() << QString("edges[%1] pair:").arg(i) << (*edges)[i]->getEdgePair()->edgeVerticesInfo() << "\n";
 		}
-	}
+	}*/
 
 	// STENY
 	(*faces)[0]->setEdge((*edges)[0]);
@@ -1532,14 +1566,17 @@ void ImageViewer::on_doubleSpinBox_ClipFar_valueChanged(double value)
 void ImageViewer::on_doubleSpinBox_LightX_valueChanged(double value)
 {
 	lightSource.x = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_LightY_valueChanged(double value)
 {
 	lightSource.y = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_LightZ_valueChanged(double value)
 {
 	lightSource.z = value;
+	update3D();
 }
 void ImageViewer::on_pushButton_LightColor_clicked()
 {
@@ -1549,6 +1586,7 @@ void ImageViewer::on_pushButton_LightColor_clicked()
 	{
 		lightSource.lightColor = chosenColor;
 		ui->pushButton_LightColor->setStyleSheet(QString("background-color:%1").arg(chosenColor.name()));
+		update3D();
 	}
 	else
 		warningMessage("Invalid color");
@@ -1557,44 +1595,54 @@ void ImageViewer::on_pushButton_LightColor_clicked()
 void ImageViewer::on_doubleSpinBox_DiffuseRed_valueChanged(double value)
 {
 	coeficientsPOM.difuse.red = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_DiffuseGreen_valueChanged(double value)
 {
 	coeficientsPOM.difuse.green = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_DiffuseBlue_valueChanged(double value)
 {
 	coeficientsPOM.difuse.blue = value;
+	update3D();
 }
 
 void ImageViewer::on_doubleSpinBox_SpecularRed_valueChanged(double value)
 {
 	coeficientsPOM.specular.red = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_SpecularGreen_valueChanged(double value)
 {
 	coeficientsPOM.specular.green = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_SpecularBlue_valueChanged(double value)
 {
 	coeficientsPOM.specular.blue = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_SpecularSharpness_valueChanged(double value)
 {
 	coeficientsPOM.specular.specularSharpness = value;
+	update3D();
 }
 
 void ImageViewer::on_doubleSpinBox_AmbientRed_valueChanged(double value)
 {
 	coeficientsPOM.ambient.red = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_AmbientGreen_valueChanged(double value)
 {
 	coeficientsPOM.ambient.green = value;
+	update3D();
 }
 void ImageViewer::on_doubleSpinBox_AmbientBlue_valueChanged(double value)
 {
 	coeficientsPOM.ambient.blue = value;
+	update3D();
 }
 void ImageViewer::on_pushButton_AmbientColor_clicked()
 {
@@ -1604,7 +1652,20 @@ void ImageViewer::on_pushButton_AmbientColor_clicked()
 	{
 		coeficientsPOM.ambient.ambientColor = chosenColor;
 		ui->pushButton_AmbientColor->setStyleSheet(QString("background-color:%1").arg(chosenColor.name()));
+		update3D();
 	}
 	else
 		warningMessage("Invalid color");
+}
+
+void ImageViewer::on_radioButton_ConstantShading_clicked()
+{
+	camera.setShadingType(Projection3D::ConstantShading);
+	update3D();
+}
+
+void ImageViewer::on_radioButton_GouraudShading_clicked()
+{
+	camera.setShadingType(Projection3D::GouraudShading);
+	update3D();
 }

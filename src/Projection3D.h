@@ -9,6 +9,7 @@ class Projection3D
 {
 private:
 	int projectionType = 0;
+	int shadingType = 0;
 
 	double zenit = M_PI_2;
 	double azimut = 0.0;
@@ -44,6 +45,7 @@ public:
 
 	// set functions
 	void setProjectionType(int projectionType) { this->projectionType = projectionType; }
+	void setShadingType(int shadingType) { this->shadingType = shadingType; }
 	void setZenit(double zenit) { this->zenit = zenit; recalculateVectors(); }
 	void setAzimut(double azimut) { this->azimut = azimut; recalculateVectors(); }
 	void setClipNearDistance(double clipNearDistance) { this->clipNearDistance = clipNearDistance; }
@@ -53,6 +55,7 @@ public:
 
 	// get functions
 	int getProjectionType() { return projectionType; }
+	int getShadingType() { return shadingType; }
 	double getZenit() { return zenit; }
 	double getAzimut() { return azimut; }
 	double getClipNearDistance() { return clipNearDistance; }
