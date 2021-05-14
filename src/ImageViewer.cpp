@@ -708,6 +708,7 @@ void ImageViewer::parallelProjection()
 
 	QVector<QPointF> newPoints;
 	QList<QColor> colors;
+	double zCoords[3] = { 0.0,0.0,0.0 };
 
 	newPoints.append(QPointF()); newPoints.append(QPointF()); newPoints.append(QPointF());
 
@@ -741,6 +742,8 @@ void ImageViewer::parallelProjection()
 		newPoints[0].setX(x2D * camera.getScaleValue() * objectScale + sX + dx);
 		newPoints[0].setY(y2D * camera.getScaleValue() * objectScale + sY + dy);
 
+		zCoords[0] = zAfter;
+
 		// druhy bod
 		xBefore = edge_next->getVertexOrigin()->getX();
 		yBefore = edge_next->getVertexOrigin()->getY();
@@ -762,6 +765,8 @@ void ImageViewer::parallelProjection()
 
 		newPoints[1].setX(x2D * camera.getScaleValue() * objectScale + sX + dx);
 		newPoints[1].setY(y2D * camera.getScaleValue() * objectScale + sY + dy);
+
+		zCoords[1] = zAfter;
 
 		// treti bod
 		xBefore = edge_prev->getVertexOrigin()->getX();
@@ -785,6 +790,8 @@ void ImageViewer::parallelProjection()
 		newPoints[2].setX(x2D * camera.getScaleValue() * objectScale + sX + dx);
 		newPoints[2].setY(y2D * camera.getScaleValue() * objectScale + sY + dy);
 
+		zCoords[2] = zAfter;
+
 		colors.clear();
 		colors.append(edge->getVertexOrigin()->getVertexColor());
 		colors.append(edge_next->getVertexOrigin()->getVertexColor());
@@ -792,7 +799,7 @@ void ImageViewer::parallelProjection()
 
 		//vW->createGeometry(newPoints, QColor("#FFFFFF"), QColor("#000000"), 0);
 		//vW->drawPolygon(newPoints, QColor("#FFFFFF"));
-		vW->drawPolygonT(newPoints, colors, camera.getShadingType());
+		vW->drawPolygonT(newPoints, colors, zCoords, camera.getShadingType());
 	}
 
 }
@@ -829,6 +836,7 @@ void ImageViewer::perspectiveProjection()
 
 	QVector<QPointF> newPoints;
 	QList<QColor> colors;
+	double zCoords[3] = { 0.0,0.0,0.0 };
 
 	newPoints.append(QPointF()); newPoints.append(QPointF()); newPoints.append(QPointF());
 
@@ -864,6 +872,8 @@ void ImageViewer::perspectiveProjection()
 		newPoints[0].setX(x2D * camera.getScaleValue() * objectScale + midPointX + dx);
 		newPoints[0].setY(y2D * camera.getScaleValue() * objectScale + midPointY + dy);
 
+		zCoords[0] = zAfter;
+
 		// druhy bod
 		xBefore = edge_next->getVertexOrigin()->getX();
 		yBefore = edge_next->getVertexOrigin()->getY();
@@ -886,6 +896,8 @@ void ImageViewer::perspectiveProjection()
 
 		newPoints[1].setX(x2D * camera.getScaleValue() * objectScale + midPointX + dx);
 		newPoints[1].setY(y2D * camera.getScaleValue() * objectScale + midPointY + dy);
+
+		zCoords[1] = zAfter;
 
 		// treti bod
 		xBefore = edge_prev->getVertexOrigin()->getX();
@@ -910,6 +922,8 @@ void ImageViewer::perspectiveProjection()
 		newPoints[2].setX(x2D * camera.getScaleValue() * objectScale + midPointX + dx);
 		newPoints[2].setY(y2D * camera.getScaleValue() * objectScale + midPointY + dy);
 
+		zCoords[2] = zAfter;
+
 		colors.clear();
 		colors.append(edge->getVertexOrigin()->getVertexColor());
 		colors.append(edge_next->getVertexOrigin()->getVertexColor());
@@ -917,7 +931,7 @@ void ImageViewer::perspectiveProjection()
 
 		//vW->createGeometry(newPoints, QColor("#FFFFFF"), QColor("#000000"), 0);
 		//vW->drawPolygon(newPoints, QColor("#FFFFFF"));
-		vW->drawPolygonT(newPoints, colors, camera.getShadingType());
+		vW->drawPolygonT(newPoints, colors, zCoords, camera.getShadingType());
 	}
 }
 

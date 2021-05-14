@@ -57,7 +57,7 @@ private:
 
 	void bubbleSortEdgesY(QVector<Edge>& polygonEdges); // usporiadanie hran podla y
 	void bubbleSortEdgesX(QVector<Edge>& polygonEdges); // usporiadnanie hran podla x
-	void bubbleSortTrianglePoints(QVector<QPointF>& trianglePoints, QList<QColor>& colors); // usporiadanie bodov trojuholnika
+	void bubbleSortTrianglePoints(QVector<QPointF>& trianglePoints, QList<QColor>& colors, double* zCoords); // usporiadanie bodov trojuholnika
 	void setEdgesOfPolygon(QVector<QPointF> polygonPoints, QVector<Edge>& polygonEdges); // vytvorenie hran pre polygon
 
 	// Hermitovske kubicke polynomy
@@ -76,6 +76,7 @@ private:
 	QColor getNearestNeighborColor(QVector<QPointF> trianglePoints, QList<QColor> colors, QPoint currentPoint);
 	QColor getBarycentricColor(QVector<QPointF> T, QList<QColor> colors, QPoint P);
 	QColor getBarycentricDistanceColor(QVector<QPointF> T, QPoint P);
+	double interpolateZ(QVector<QPointF> T, QPoint P, double* zCoors);
 
 	// kreslenie, orezavanie, vyfarbovanie
 	void drawBresenhamChosenX(QPoint point1, QPoint point2, QColor color);
@@ -85,7 +86,7 @@ private:
 	void trimPolygon(QVector<QPointF>& V);
 	void trim(QVector<QPointF>& geometryPoints);
 	void fillPolygonScanLineAlgorithm(QVector<QPointF> polygonPoints, QColor fillColor);
-	void fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors, int interpolationMethod);
+	void fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors, double* zCoords, int interpolationMethod);
 
 	void drawHermitCurve(QVector<QPoint> curvePoints, QVector<TangentVector> tangentVectors, QColor color);
 	void drawTangentVectors(QVector<QPoint> curvePoints, QVector<TangentVector> tangentVectors, QColor color);
@@ -104,7 +105,7 @@ public:
 	void drawLineDDA(QPoint point1, QPoint point2, QColor color);
 	void drawLine(QPointF point1, QPointF point2, QColor color, bool shouldDrawPoints = false);
 	void drawPolygon(QVector<QPointF> polygonPoints, QColor penColor);
-	void drawPolygonT(QVector<QPointF> polygonPoints, QList<QColor> colors, int shading);
+	void drawPolygonT(QVector<QPointF> polygonPoints, QList<QColor> colors, double* zCoords, int shading);
 	void createGeometry(QVector<QPointF> geometryPoints, QColor penColor, QColor fillColor, int interpolationMethod);
 	void createCurve(QVector<QPoint>& curvePoints, QVector<TangentVector> tangentVectors, QColor penColor, int curveType);
 

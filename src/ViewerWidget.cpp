@@ -70,9 +70,11 @@ void ViewerWidget::bubbleSortEdgesX(QVector<Edge>& polygonEdges)
 
 	}
 }
-void ViewerWidget::bubbleSortTrianglePoints(QVector<QPointF>& trianglePoints, QList<QColor>& colors)
+void ViewerWidget::bubbleSortTrianglePoints(QVector<QPointF>& trianglePoints, QList<QColor>& colors, double* zCoords)
 {
 	QColor temp;
+	double tempDouble = 0.0;
+
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3 - i - 1; j++)
@@ -80,9 +82,14 @@ void ViewerWidget::bubbleSortTrianglePoints(QVector<QPointF>& trianglePoints, QL
 			if (trianglePoints[j].y() > trianglePoints[j + 1].y())
 			{
 				swapPoints(trianglePoints[j], trianglePoints[j + 1]);
+				
 				temp = colors[j];
 				colors[j] = colors[j + 1];
 				colors[j + 1] = temp;
+
+				tempDouble = zCoords[j];
+				zCoords[j] = zCoords[j + 1];
+				zCoords[j + 1] = tempDouble;
 			}
 		}
 	}
@@ -96,6 +103,10 @@ void ViewerWidget::bubbleSortTrianglePoints(QVector<QPointF>& trianglePoints, QL
 			temp = colors[0];
 			colors[0] = colors[1];
 			colors[1] = temp;
+
+			tempDouble = zCoords[0];
+			zCoords[0] = zCoords[1];
+			zCoords[1] = tempDouble;
 		}
 			
 	}
@@ -108,6 +119,10 @@ void ViewerWidget::bubbleSortTrianglePoints(QVector<QPointF>& trianglePoints, QL
 			temp = colors[1];
 			colors[1] = colors[2];
 			colors[2] = temp;
+
+			tempDouble = zCoords[1];
+			zCoords[1] = zCoords[2];
+			zCoords[2] = tempDouble;
 		}
 	}
 }
@@ -238,6 +253,14 @@ QColor ViewerWidget::getBarycentricDistanceColor(QVector<QPointF> T, QPoint P)
 	outputColor.setBlue(blue);
 
 	return outputColor;
+}
+
+double ViewerWidget::interpolateZ(QVector<QPointF> T, QPoint P, double* zCoors)
+{
+	double interpolatedZ = 0.0;
+
+	
+	return interpolatedZ;
 }
 
 void ViewerWidget::drawBresenhamChosenX(QPoint point1, QPoint point2, QColor color)
@@ -607,7 +630,7 @@ void ViewerWidget::fillPolygonScanLineAlgorithm(QVector<QPointF> polygonPoints, 
 
 	update();
 }
-void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors, int interpolationMethod)
+void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors, double* zCoords, int interpolationMethod)
 {
 	//qDebug() << "triangle scanLine";
 	QPointF P(-1, -1);
@@ -617,7 +640,7 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 
 	//printPoints(T);
 	//qDebug() << "sorting";
-	bubbleSortTrianglePoints(T, colors);
+	bubbleSortTrianglePoints(T, colors, zCoords);
 	//printPoints(T);
 
 	if (T[0].y() == T[1].y()) // vlastne spodny trojuholnik -> vodorovna strana je hore
@@ -675,8 +698,8 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 		w4 = 1.0 / m;
 	}
 
-	y = e1[0].y(); // zaciatocny bod usecky e1 -> y suradnica
-	yMax = e1[1].y(); // koncovy bod usecky e1 -> y suradnica
+	y = static_cast<int>(e1[0].y() + 0.5); // zaciatocny bod usecky e1 -> y suradnica
+	yMax = static_cast<int>(e1[1].y() + 0.5); // koncovy bod usecky e1 -> y suradnica
 	x1 = e1[0].x(); x2 = e2[0].x();
 
 	while (y < yMax)
@@ -684,22 +707,26 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 		deltaX = static_cast<int>(x2 + 0.5) - static_cast<int>(x1 + 0.5);
 
 		//if ((x1 - x2) > 0.000000001)
-		for (int i = 1; i <= deltaX; i++)
+		for (int i = 0; i <= deltaX; i++)
 		{
 			if (interpolationMethod == NearestNeighbor)
+			{
 				setPixel(static_cast<int>(x1 + 0.5) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+			}
 			else if (interpolationMethod == Barycentric1)
+			{
 				setPixel(static_cast<int>(x1 + 0.5) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+			}
 		}
 
 		x1 += w1; x2 += w2;
 		y++;
 	}
 
-	if (P != QPoint(-1, -1)) // ak sa rozdeloval trojuhlnik, tak sa vyfarbi aj spodna cast
+	if (P != QPointF(-1.0, -1.0)) // ak sa rozdeloval trojuhlnik, tak sa vyfarbi aj spodna cast
 	{
-		y = e3[0].y();
-		yMax = e3[1].y();
+		y = static_cast<int>(e3[0].y() + 0.5);
+		yMax = static_cast<int>(e3[1].y() + 0.5);
 		x1 = e3[0].x(); x2 = e4[0].x();
 
 		while (y < yMax)
@@ -707,12 +734,16 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 			deltaX = static_cast<int>(x2 + 0.5) - static_cast<int>(x1 + 0.5);
 
 			//if ((x1 - x2) > 0.000000001)
-			for (int i = 1; i <= deltaX; i++)
+			for (int i = 0; i <= deltaX; i++)
 			{
 				if (interpolationMethod == NearestNeighbor)
+				{
 					setPixel(static_cast<int>(x1) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1) + i, y)));
+				}
 				else if (interpolationMethod == Barycentric1)
+				{
 					setPixel(static_cast<int>(x1) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1) + i, y)));
+				}
 			}
 
 			x1 += w3; x2 += w4;
@@ -868,7 +899,7 @@ void ViewerWidget::drawPolygon(QVector<QPointF> polygonPoints, QColor penColor)
 	}
 }
 
-void ViewerWidget::drawPolygonT(QVector<QPointF> polygonPoints, QList<QColor> colors, int shading)
+void ViewerWidget::drawPolygonT(QVector<QPointF> polygonPoints, QList<QColor> colors, double* zCoords, int shading)
 {
 	QColor tempColor("#000000");
 
@@ -879,14 +910,14 @@ void ViewerWidget::drawPolygonT(QVector<QPointF> polygonPoints, QList<QColor> co
 
 		// vyfarbenie
 		if (polygonPoints.size() == 3)
-			fillTriangleScanLine(polygonPoints, colors, shading);
+			fillTriangleScanLine(polygonPoints, colors, zCoords, shading);
 		else
 		{
-			tempColor.setRedF((colors[0].redF() + colors[1].redF() + colors[2].redF()) / 3.0);
-			tempColor.setGreenF((colors[0].greenF() + colors[1].greenF() + colors[2].greenF()) / 3.0);
-			tempColor.setBlueF((colors[0].blueF() + colors[1].blueF() + colors[2].blueF()) / 3.0);
+			//tempColor.setRedF((colors[0].redF() + colors[1].redF() + colors[2].redF()) / 3.0);
+			//tempColor.setGreenF((colors[0].greenF() + colors[1].greenF() + colors[2].greenF()) / 3.0);
+			//tempColor.setBlueF((colors[0].blueF() + colors[1].blueF() + colors[2].blueF()) / 3.0);
 
-			fillPolygonScanLineAlgorithm(polygonPoints, tempColor);
+			//fillPolygonScanLineAlgorithm(polygonPoints, tempColor);
 		}
 
 		/*for (int i = 1; i <= polygonPoints.size(); i++)
