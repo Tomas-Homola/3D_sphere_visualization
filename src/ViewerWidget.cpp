@@ -724,15 +724,12 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 void ViewerWidget::drawHermitCurve(QVector<QPoint> curvePoints, QVector<TangentVector> tangentVectors, QColor color)
 {
 }
-
 void ViewerWidget::drawTangentVectors(QVector<QPoint> curvePoints, QVector<TangentVector> tangentVectors, QColor color)
 {
 }
-
 void ViewerWidget::drawBezierCurve(QVector<QPoint> curvePoints, QColor color)
 {
 }
-
 void ViewerWidget::drawCoonsCurve(QVector<QPoint> curvePoints, QColor color)
 {
 }
@@ -751,6 +748,18 @@ ViewerWidget::ViewerWidget(QString viewerName, QSize imgSize, QWidget* parent)
 		resizeWidget(img->size());
 		setPainter();
 		setDataPtr();
+
+		int height = imgSize.height();
+		int width = imgSize.width();
+
+		zBuffer = new double*[width];
+		for (int i = 0; i < width; i++)
+		{
+			zBuffer[i] = new double[height];
+			
+			for (int j = 0; j < height; j++)
+				zBuffer[i][j] = DBL_MIN;
+		}
 	}
 }
 ViewerWidget::~ViewerWidget()
@@ -861,15 +870,24 @@ void ViewerWidget::drawPolygon(QVector<QPointF> polygonPoints, QColor penColor)
 
 void ViewerWidget::drawPolygonT(QVector<QPointF> polygonPoints, QList<QColor> colors, int shading)
 {
+	QColor tempColor("#000000");
+
 	if (polygonPoints.size() > 2)
 	{
-		trimPolygon(polygonPoints);
+		trim(polygonPoints);
+		//trimPolygon(polygonPoints);
 
 		// vyfarbenie
 		if (polygonPoints.size() == 3)
 			fillTriangleScanLine(polygonPoints, colors, shading);
 		else
-			fillPolygonScanLineAlgorithm(polygonPoints, colors[0]);
+		{
+			tempColor.setRedF((colors[0].redF() + colors[1].redF() + colors[2].redF()) / 3.0);
+			tempColor.setGreenF((colors[0].greenF() + colors[1].greenF() + colors[2].greenF()) / 3.0);
+			tempColor.setBlueF((colors[0].blueF() + colors[1].blueF() + colors[2].blueF()) / 3.0);
+
+			fillPolygonScanLineAlgorithm(polygonPoints, tempColor);
+		}
 
 		/*for (int i = 1; i <= polygonPoints.size(); i++)
 		{
@@ -946,6 +964,7 @@ void ViewerWidget::clear(QColor color)
 		for (size_t y = 0; y < img->height(); y++)
 		{
 			setPixel(x, y, color);
+			zBuffer[x][y] = DBL_MIN; // zresetovanie Z-bufferu
 		}
 	}
 	update();

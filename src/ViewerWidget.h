@@ -40,6 +40,8 @@ private:
 	QRgb* data = nullptr;
 	QPainter* painter = nullptr;
 
+	double** zBuffer = nullptr;
+
 	// custom rgb colors
 	QColor defaultColor0 = QColor("#ED1C24");
 	QColor defaultColor1 = QColor("#00AD33");
@@ -124,6 +126,7 @@ public:
 	void setPainter() { painter = new QPainter(img); }
 	void setDataPtr() { data = reinterpret_cast<QRgb*>(img->bits()); }
 	QPainter* getPainter() { return painter; }
+	double** getZBuffer() { return zBuffer; }
 
 	int getImgWidth() { return img->width(); };
 	int getImgHeight() { return img->height(); };

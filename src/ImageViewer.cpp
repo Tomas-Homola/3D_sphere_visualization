@@ -1,4 +1,5 @@
 #include "ImageViewer.h"
+#include <iostream>
 
 ImageViewer::ImageViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::ImageViewerClass)
 {
@@ -19,9 +20,9 @@ ImageViewer::ImageViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::Imag
 	camera.setClipFarDistance(ui->doubleSpinBox_ClipFar->value());
 
 	// setings right
-	lightSource.x = ui->doubleSpinBox_LightX->value();
-	lightSource.y = ui->doubleSpinBox_LightY->value();
-	lightSource.z = ui->doubleSpinBox_LightZ->value();
+	lightSource.x = (double)ui->horizontalSlider_LightX->value();
+	lightSource.y = (double)ui->horizontalSlider_LightY->value();
+	lightSource.z = (double)ui->horizontalSlider_LightZ->value();
 	lightSource.lightColor = QColor("#FFFFFF");
 	ui->pushButton_LightColor->setStyleSheet("background-color:#FFFFFF");
 
@@ -827,6 +828,7 @@ void ImageViewer::perspectiveProjection()
 	H_edge* edge = nullptr, * edge_next = nullptr, * edge_prev = nullptr;
 
 	QVector<QPointF> newPoints;
+	QList<QColor> colors;
 
 	newPoints.append(QPointF()); newPoints.append(QPointF()); newPoints.append(QPointF());
 
@@ -908,9 +910,14 @@ void ImageViewer::perspectiveProjection()
 		newPoints[2].setX(x2D * camera.getScaleValue() * objectScale + midPointX + dx);
 		newPoints[2].setY(y2D * camera.getScaleValue() * objectScale + midPointY + dy);
 
+		colors.clear();
+		colors.append(edge->getVertexOrigin()->getVertexColor());
+		colors.append(edge_next->getVertexOrigin()->getVertexColor());
+		colors.append(edge_prev->getVertexOrigin()->getVertexColor());
 
 		//vW->createGeometry(newPoints, QColor("#FFFFFF"), QColor("#000000"), 0);
-		vW->drawPolygon(newPoints, QColor("#FFFFFF"));
+		//vW->drawPolygon(newPoints, QColor("#FFFFFF"));
+		vW->drawPolygonT(newPoints, colors, camera.getShadingType());
 	}
 }
 
@@ -938,19 +945,22 @@ void ImageViewer::calculateColors()
 
 		// normala
 		N = currentVertex->getVertexNormal();
-		
+		//qDebug() << QString("norm(N)=%1").arg(norm(N));
+
 		// svetelny luc
-		L.x = lightSource.x - currentVertex->getX();
-		L.y = lightSource.y - currentVertex->getY();
-		L.z = lightSource.z - currentVertex->getZ();
+		L.x = currentVertex->getX() - lightSource.x;
+		L.y = currentVertex->getY() - lightSource.y;
+		L.z = currentVertex->getZ() - lightSource.z;
 
 		L = L / norm(L);
+		//qDebug() << QString("norm(L)=%1").arg(norm(L));
 		
 		// odrazeny luc
 		temp = 2.0 * dotProduct(L, N);
 		R = N * temp - L;
 
 		R = R / norm(R);
+		//qDebug() << QString("norm(R)=%1").arg(norm(R));
 
 		if (camera.getProjectionType() == Projection3D::ParallelProjection)
 		{
@@ -959,12 +969,14 @@ void ImageViewer::calculateColors()
 		else if (camera.getProjectionType() == Projection3D::PerspectiveProjection)
 		{
 			V = camera.getVector_n() * camera.getCameraDistance();
-			V.x = V.x - currentVertex->getX();
-			V.y = V.y - currentVertex->getY();
-			V.z = V.z - currentVertex->getZ();
+
+			V.x = currentVertex->getX() - V.x;
+			V.y = currentVertex->getY() - V.y;
+			V.z = currentVertex->getZ() - V.z;
 		}
 
 		V = V / norm(V);
+		//qDebug() << QString("norm(V)=%1").arg(norm(V));
 
 		// zrkadlova zlozka
 		if (dotProduct(V, R) <= 0.0)
@@ -1563,19 +1575,19 @@ void ImageViewer::on_doubleSpinBox_ClipFar_valueChanged(double value)
 	update3D();
 }
 
-void ImageViewer::on_doubleSpinBox_LightX_valueChanged(double value)
+void ImageViewer::on_horizontalSlider_LightX_valueChanged(int value)
 {
-	lightSource.x = value;
+	lightSource.x = (double)value;
 	update3D();
 }
-void ImageViewer::on_doubleSpinBox_LightY_valueChanged(double value)
+void ImageViewer::on_horizontalSlider_LightY_valueChanged(int value)
 {
-	lightSource.y = value;
+	lightSource.y = (double)value;
 	update3D();
 }
-void ImageViewer::on_doubleSpinBox_LightZ_valueChanged(double value)
+void ImageViewer::on_horizontalSlider_LightZ_valueChanged(int value)
 {
-	lightSource.z = value;
+	lightSource.z = (double)value;
 	update3D();
 }
 void ImageViewer::on_pushButton_LightColor_clicked()

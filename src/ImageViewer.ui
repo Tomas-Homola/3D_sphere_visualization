@@ -525,6 +525,12 @@
         <height>0</height>
        </size>
       </property>
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="font">
        <font>
         <family>Leelawadee UI</family>
@@ -569,27 +575,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_LightX">
-            <property name="font">
-             <font>
-              <family>Leelawadee UI</family>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="minimum">
-             <double>0.500000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>5.000000000000000</double>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_LightY">
             <property name="font">
@@ -605,27 +590,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_LightY">
-            <property name="font">
-             <font>
-              <family>Leelawadee UI</family>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="minimum">
-             <double>0.500000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>5.000000000000000</double>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_LightZ">
             <property name="font">
@@ -638,27 +602,6 @@
             </property>
             <property name="text">
              <string>Z:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_LightZ">
-            <property name="font">
-             <font>
-              <family>Leelawadee UI</family>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="minimum">
-             <double>0.500000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>5.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -679,6 +622,63 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSlider" name="horizontalSlider_LightX">
+            <property name="minimum">
+             <number>-20</number>
+            </property>
+            <property name="maximum">
+             <number>20</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksBelow</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSlider" name="horizontalSlider_LightY">
+            <property name="minimum">
+             <number>-20</number>
+            </property>
+            <property name="maximum">
+             <number>20</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksBelow</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSlider" name="horizontalSlider_LightZ">
+            <property name="minimum">
+             <number>-20</number>
+            </property>
+            <property name="maximum">
+             <number>20</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksBelow</enum>
             </property>
            </widget>
           </item>
@@ -746,7 +746,10 @@
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -764,7 +767,10 @@
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -778,11 +784,17 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="maximum">
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.459000000000000</double>
             </property>
            </widget>
           </item>
@@ -889,11 +901,17 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="maximum">
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.996000000000000</double>
             </property>
            </widget>
           </item>
@@ -911,10 +929,10 @@
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="value">
-             <double>0.500000000000000</double>
+             <double>0.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -932,7 +950,10 @@
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -946,14 +967,17 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="maximum">
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="value">
-             <double>0.500000000000000</double>
+             <double>0.122000000000000</double>
             </property>
            </widget>
           </item>
@@ -971,7 +995,10 @@
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -989,7 +1016,10 @@
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.050000000000000</double>
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000000000000000</double>
             </property>
            </widget>
           </item>

@@ -106,9 +106,9 @@ private slots:
 	void on_doubleSpinBox_ClipFar_valueChanged(double value);
 
 	// light source
-	void on_doubleSpinBox_LightX_valueChanged(double value);
-	void on_doubleSpinBox_LightY_valueChanged(double value);
-	void on_doubleSpinBox_LightZ_valueChanged(double value);
+	void on_horizontalSlider_LightX_valueChanged(int value);
+	void on_horizontalSlider_LightY_valueChanged(int value);
+	void on_horizontalSlider_LightZ_valueChanged(int value);
 	void on_pushButton_LightColor_clicked();
 
 	// diffuse
