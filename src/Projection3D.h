@@ -1,8 +1,8 @@
 #pragma once
 #include "qmath.h"
-//#include "qstring.h"
 #include "qcolor.h"
 #include "structs.h"
+#include "qvector3d.h"
 
 // napad pre tuto triedu mi poradil Alex Filip
 class Projection3D
@@ -21,9 +21,9 @@ private:
 
 	double cameraDistance = 10.0;
 
-	Vector n;
-	Vector u;
-	Vector v;
+	QVector3D n;
+	QVector3D u;
+	QVector3D v;
 
 	void recalculateVector_n();
 	void recalculateVector_u();
@@ -62,9 +62,9 @@ public:
 	double getClipFarDistance() { return clipFarDistance; }
 	double getScaleValue() { return scaleValue; }
 	double getCameraDistance() { return cameraDistance; }
-	Vector getVector_n() { return n; }
-	Vector getVector_u() { return u; }
-	Vector getVector_v() { return v; }
+	QVector3D getVector_n() { return n; }
+	QVector3D getVector_u() { return u; }
+	QVector3D getVector_v() { return v; }
 
 	QString getCoordinatesVector_n(int precision = 6);
 	QString getCoordinatesVector_u(int precision = 6);

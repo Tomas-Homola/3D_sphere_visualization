@@ -3,6 +3,7 @@
 #include "qlist.h"
 #include "qcolor.h"
 #include "structs.h"
+#include "qvector3d.h"
 
 class H_edge;
 
@@ -17,7 +18,7 @@ private:
 
 	H_edge* edge = nullptr;
 
-	Vector vertexNormal{ DBL_MIN,DBL_MIN,DBL_MIN };
+	QVector3D vertexNormal = QVector3D(FLT_MIN, FLT_MIN, FLT_MIN);
 
 	QColor vertexColor;
 	QPoint projectedPoint;
@@ -34,8 +35,8 @@ public:
 	void setIndex(int newIndex) { index = newIndex; }
 	void setEdge(H_edge* edge) { this->edge = edge; }
 
-	void setVertexNormal(Vector newVertexNormal) { vertexNormal = newVertexNormal; }
-	void setVertexNormal(double x, double y, double z) { vertexNormal.x = x; vertexNormal.y = y; vertexNormal.z = z; }
+	void setVertexNormal(QVector3D newVertexNormal) { vertexNormal = newVertexNormal; }
+	void setVertexNormal(float x, float y, float z) { vertexNormal.setX(x); vertexNormal.setY(y); vertexNormal.setZ(z); }
 	void setVertexColor(QColor newVertexColor) { vertexColor = newVertexColor; }
 	void setVertexColor(double red, double green, double blue);
 	void setVertexColor(int red, int green, int blue);
@@ -48,7 +49,7 @@ public:
 	H_edge* getEdge() { return edge; }
 
 	QColor getVertexColor() { return vertexColor; }
-	Vector getVertexNormal() { return vertexNormal; }
+	QVector3D getVertexNormal() { return vertexNormal; }
 
 	// other
 	QString vertexInfo(int precision = 6);
@@ -64,7 +65,7 @@ class Face
 private:
 	H_edge* edge = nullptr;
 
-	Vector faceNormal{ DBL_MIN,DBL_MIN,DBL_MIN };
+	QVector3D faceNormal = QVector3D(FLT_MIN, FLT_MIN, FLT_MIN);
 
 	QColor faceColor;
 
@@ -75,15 +76,15 @@ public:
 	// set functions
 	void setEdge(H_edge* edge) { this->edge = edge; }
 
-	void setFaceNormal(Vector newFaceNormal) { faceNormal = newFaceNormal; }
-	void setFaceNormal(double x, double y, double z) { faceNormal.x = x; faceNormal.y = y; faceNormal.z = z; }
+	void setFaceNormal(QVector3D newFaceNormal) { faceNormal = newFaceNormal; }
+	void setFaceNormal(float x, float y, float z) { faceNormal.setX(x); faceNormal.setY(y); faceNormal.setZ(z); }
 	void setFaceColor(QColor newFaceColor) { faceColor = newFaceColor; }
 	void setFaceColor(double red, double green, double blue);
 	void setFaceColor(int red, int green, int blue);
 
 	// get functions
 	H_edge* getEdge() { return edge; }
-	Vector getFaceNormal() { return faceNormal; }
+	QVector3D getFaceNormal() { return faceNormal; }
 	QColor getFaceColor() { return faceColor; }
 
 	// other

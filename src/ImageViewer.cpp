@@ -696,12 +696,12 @@ void ImageViewer::parallelProjection()
 	double objectScale = ui->doubleSpinBox_ObjectScale->value() * 1.5;
 	double distance = 0.0;
 
-	double a = camera.getVector_n().x;
-	double b = camera.getVector_n().y;
-	double c = camera.getVector_n().z;
+	double a = (double)camera.getVector_n().x();
+	double b = (double)camera.getVector_n().y();
+	double c = (double)camera.getVector_n().z();
 
-	Vector u = camera.getVector_u();
-	Vector v = camera.getVector_v();
+	QVector3D u = camera.getVector_u();
+	QVector3D v = camera.getVector_v();
 
 	QList<Face*>* faces = octahedron.pointerFaces();
 	H_edge* edge = nullptr, * edge_next = nullptr, * edge_prev = nullptr;
@@ -736,8 +736,8 @@ void ImageViewer::parallelProjection()
 		zAfter = zBefore - c * temp;
 
 		//https://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
-		x2D = v.x * xAfter + v.y * yAfter + v.z * zAfter;
-		y2D = u.x * xAfter + u.y * yAfter + u.z * zAfter;
+		x2D = v.x() * xAfter + v.y() * yAfter + v.z() * zAfter;
+		y2D = u.x() * xAfter + u.y() * yAfter + u.z() * zAfter;
 
 		newPoints[0].setX(x2D * camera.getScaleValue() * objectScale + sX + dx);
 		newPoints[0].setY(y2D * camera.getScaleValue() * objectScale + sY + dy);
@@ -760,8 +760,8 @@ void ImageViewer::parallelProjection()
 		zAfter = zBefore - c * temp;
 
 		//https://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
-		x2D = v.x * xAfter + v.y * yAfter + v.z * zAfter;
-		y2D = u.x * xAfter + u.y * yAfter + u.z * zAfter;
+		x2D = v.x() * xAfter + v.y() * yAfter + v.z() * zAfter;
+		y2D = u.x() * xAfter + u.y() * yAfter + u.z() * zAfter;
 
 		newPoints[1].setX(x2D * camera.getScaleValue() * objectScale + sX + dx);
 		newPoints[1].setY(y2D * camera.getScaleValue() * objectScale + sY + dy);
@@ -784,8 +784,8 @@ void ImageViewer::parallelProjection()
 		zAfter = zBefore - c * temp;
 
 		//https://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
-		x2D = v.x * xAfter + v.y * yAfter + v.z * zAfter;
-		y2D = u.x * xAfter + u.y * yAfter + u.z * zAfter;
+		x2D = v.x() * xAfter + v.y() * yAfter + v.z() * zAfter;
+		y2D = u.x() * xAfter + u.y() * yAfter + u.z() * zAfter;
 
 		newPoints[2].setX(x2D * camera.getScaleValue() * objectScale + sX + dx);
 		newPoints[2].setY(y2D * camera.getScaleValue() * objectScale + sY + dy);
@@ -819,17 +819,17 @@ void ImageViewer::perspectiveProjection()
 	double objectScale = ui->doubleSpinBox_ObjectScale->value() * 1.5;
 	double distance = 0.0;
 
-	double a = camera.getVector_n().x;
-	double b = camera.getVector_n().y;
-	double c = camera.getVector_n().z;
+	double a = (double)camera.getVector_n().x();
+	double b = (double)camera.getVector_n().y();
+	double c = (double)camera.getVector_n().z();
 
-	Vector u = camera.getVector_u();
-	Vector v = camera.getVector_v();
-	Vector S = camera.getVector_n();
+	QVector3D u = camera.getVector_u();
+	QVector3D v = camera.getVector_v();
+	QVector3D S = camera.getVector_n();
 
-	S.x = S.x * camera.getCameraDistance();
-	S.y = S.y * camera.getCameraDistance();
-	S.z = S.z * camera.getCameraDistance();
+	S.setX(S.x() * camera.getCameraDistance());
+	S.setY(S.y() * camera.getCameraDistance());
+	S.setZ(S.z() * camera.getCameraDistance());
 
 	QList<Face*>* faces = octahedron.pointerFaces();
 	H_edge* edge = nullptr, * edge_next = nullptr, * edge_prev = nullptr;
@@ -858,16 +858,16 @@ void ImageViewer::perspectiveProjection()
 		if ((distance < camera.getClipNearDistance()) || (distance > camera.getClipFarDistance()))
 			continue;
 
-		temp = (a * xBefore + b * yBefore + c * zBefore) / (a * (S.x - xBefore) + b * (S.y - yBefore) + c * (S.z - zBefore));
+		temp = (a * xBefore + b * yBefore + c * zBefore) / (a * (S.x() - xBefore) + b * (S.y() - yBefore) + c * (S.z() - zBefore));
 
-		xAfter = xBefore - (xBefore - S.x) * temp;
-		yAfter = yBefore - (yBefore - S.y) * temp;
-		zAfter = zBefore - (zBefore - S.z) * temp;
+		xAfter = xBefore - (xBefore - S.x()) * temp;
+		yAfter = yBefore - (yBefore - S.y()) * temp;
+		zAfter = zBefore - (zBefore - S.z()) * temp;
 
 		//https://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
 		// povodne bol pre x vektor u a pre y vektor v, ale trochu divne to kreslilo
-		x2D = v.x * xAfter + v.y * yAfter + v.z * zAfter;
-		y2D = u.x * xAfter + u.y * yAfter + u.z * zAfter;
+		x2D = v.x() * xAfter + v.y() * yAfter + v.z() * zAfter;
+		y2D = u.x() * xAfter + u.y() * yAfter + u.z() * zAfter;
 
 		newPoints[0].setX(x2D * camera.getScaleValue() * objectScale + midPointX + dx);
 		newPoints[0].setY(y2D * camera.getScaleValue() * objectScale + midPointY + dy);
@@ -883,16 +883,16 @@ void ImageViewer::perspectiveProjection()
 		if ((distance < camera.getClipNearDistance()) || (distance > camera.getClipFarDistance()))
 			continue;
 
-		temp = (a * xBefore + b * yBefore + c * zBefore) / (a * (S.x - xBefore) + b * (S.y - yBefore) + c * (S.z - zBefore));
+		temp = (a * xBefore + b * yBefore + c * zBefore) / (a * (S.x() - xBefore) + b * (S.y() - yBefore) + c * (S.z() - zBefore));
 
-		xAfter = xBefore - (xBefore - S.x) * temp;
-		yAfter = yBefore - (yBefore - S.y) * temp;
-		zAfter = zBefore - (zBefore - S.z) * temp;
+		xAfter = xBefore - (xBefore - S.x()) * temp;
+		yAfter = yBefore - (yBefore - S.y()) * temp;
+		zAfter = zBefore - (zBefore - S.z()) * temp;
 
 		//https://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
 		// povodne bol pre x vektor u a pre y vektor v, ale trochu divne to kreslilo
-		x2D = v.x * xAfter + v.y * yAfter + v.z * zAfter;
-		y2D = u.x * xAfter + u.y * yAfter + u.z * zAfter;
+		x2D = v.x() * xAfter + v.y() * yAfter + v.z() * zAfter;
+		y2D = u.x() * xAfter + u.y() * yAfter + u.z() * zAfter;
 
 		newPoints[1].setX(x2D * camera.getScaleValue() * objectScale + midPointX + dx);
 		newPoints[1].setY(y2D * camera.getScaleValue() * objectScale + midPointY + dy);
@@ -908,16 +908,16 @@ void ImageViewer::perspectiveProjection()
 		if ((distance < camera.getClipNearDistance()) || (distance > camera.getClipFarDistance()))
 			continue;
 
-		temp = (a * xBefore + b * yBefore + c * zBefore) / (a * (S.x - xBefore) + b * (S.y - yBefore) + c * (S.z - zBefore));
+		temp = (a * xBefore + b * yBefore + c * zBefore) / (a * (S.x() - xBefore) + b * (S.y() - yBefore) + c * (S.z() - zBefore));
 
-		xAfter = xBefore - (xBefore - S.x) * temp;
-		yAfter = yBefore - (yBefore - S.y) * temp;
-		zAfter = zBefore - (zBefore - S.z) * temp;
+		xAfter = xBefore - (xBefore - S.x()) * temp;
+		yAfter = yBefore - (yBefore - S.y()) * temp;
+		zAfter = zBefore - (zBefore - S.z()) * temp;
 
 		//https://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
 		// povodne bol pre x vektor u a pre y vektor v, ale trochu divne to kreslilo
-		x2D = v.x * xAfter + v.y * yAfter + v.z * zAfter;
-		y2D = u.x * xAfter + u.y * yAfter + u.z * zAfter;
+		x2D = v.x() * xAfter + v.y() * yAfter + v.z() * zAfter;
+		y2D = u.x() * xAfter + u.y() * yAfter + u.z() * zAfter;
 
 		newPoints[2].setX(x2D * camera.getScaleValue() * objectScale + midPointX + dx);
 		newPoints[2].setY(y2D * camera.getScaleValue() * objectScale + midPointY + dy);
@@ -937,7 +937,7 @@ void ImageViewer::perspectiveProjection()
 
 void ImageViewer::calculateColors()
 {
-	Vector L{ 0.0,0.0,0.0 }, R{ 0.0,0.0,0.0 }, V{ 0.0,0.0,0.0 }, N{ 0.0,0.0,0.0 };
+	QVector3D L(0.0,0.0,0.0), R(0.0, 0.0, 0.0), V(0.0, 0.0, 0.0), N(0.0, 0.0, 0.0);
 	QList<Vertex*>* vertices = octahedron.pointerVertices();
 	QList<Face*>* faces = octahedron.pointerFaces();
 	Vertex* currentVertex = nullptr;
@@ -959,23 +959,20 @@ void ImageViewer::calculateColors()
 
 		// normala
 		N = currentVertex->getVertexNormal();
-		//qDebug() << QString("norm(N)=%1").arg(norm(N));
 
 		// svetelny luc
-		L.x = currentVertex->getX() - lightSource.x;
-		L.y = currentVertex->getY() - lightSource.y;
-		L.z = currentVertex->getZ() - lightSource.z;
+		L.setX(lightSource.x - currentVertex->getX());
+		L.setY(lightSource.y - currentVertex->getY());
+		L.setZ(lightSource.z - currentVertex->getZ());
 
-		L = L / norm(L);
-		//qDebug() << QString("norm(L)=%1").arg(norm(L));
+		L.normalize();
 		
 		// odrazeny luc
-		temp = 2.0 * dotProduct(L, N);
-		R = N * temp - L;
+		temp = 2.0 * QVector3D::dotProduct(L, N);
+		R = temp * N - L;
 
-		R = R / norm(R);
-		//qDebug() << QString("norm(R)=%1").arg(norm(R));
-
+		R.normalize();
+		
 		if (camera.getProjectionType() == Projection3D::ParallelProjection)
 		{
 			V = camera.getVector_n();
@@ -984,50 +981,44 @@ void ImageViewer::calculateColors()
 		{
 			V = camera.getVector_n() * camera.getCameraDistance();
 
-			V.x = currentVertex->getX() - V.x;
-			V.y = currentVertex->getY() - V.y;
-			V.z = currentVertex->getZ() - V.z;
+			V.setX(V.x() - currentVertex->getX());
+			V.setY(V.y() - currentVertex->getY());
+			V.setZ(V.z() - currentVertex->getZ());
 		}
 
-		V = V / norm(V);
-		//qDebug() << QString("norm(V)=%1").arg(norm(V));
+		V.normalize();
 
 		// zrkadlova zlozka
-		if (dotProduct(V, R) <= 0.0)
+		if (QVector3D::dotProduct(V, R) <= 0.0)
 			I_s = QColor("#000000");
-		else if (dotProduct(L, N) <= 0.0)
+		else if (QVector3D::dotProduct(L, N) <= 0.0)
 			I_s = QColor("#000000");
 		else
 		{
-			temp = qPow(dotProduct(V, R), h);
+			temp = qPow(QVector3D::dotProduct(V, R), h);
 			red = I_L.redF() * r_s.red * temp;
 			green = I_L.greenF() * r_s.green * temp;
 			blue = I_L.blueF() * r_s.blue * temp;
 
 			I_s.setRedF(red); I_s.setGreenF(green); I_s.setBlueF(blue);
 		}
-		//qDebug() << "Point\n" << QString("Specular: r=%1 g=%2 b=%3").arg(red).arg(green).arg(blue);
 
 		// diffuzna zlozka
-		if (dotProduct(L, N) <= 0.0)
+		if (QVector3D::dotProduct(L, N) <= 0.0)
 			I_d = QColor("#000000");
 		else
 		{
-			red = I_L.redF() * r_d.red * dotProduct(L, N);
-			green = I_L.greenF() * r_d.green * dotProduct(L, N);
-			blue = I_L.blueF() * r_d.blue * dotProduct(L, N);
+			red = I_L.redF() * r_d.red * QVector3D::dotProduct(L, N);
+			green = I_L.greenF() * r_d.green * QVector3D::dotProduct(L, N);
+			blue = I_L.blueF() * r_d.blue * QVector3D::dotProduct(L, N);
 
 			I_d.setRedF(red); I_d.setGreenF(green); I_d.setBlueF(blue);
 		}
-
-		//qDebug() << QString("Diffuse: r=%1 g=%2 b=%3").arg(red).arg(green).arg(blue);
 
 		// ambientna zlozka
 		red = I_o.redF() * r_a.red;
 		green = I_o.greenF() * r_a.green;
 		blue = I_o.blueF() * r_a.blue;
-
-		//qDebug() << QString("Ambient: r=%1 g=%2 b=%3").arg(red).arg(green).arg(blue) << "\n";
 
 		I_a.setRedF(red); I_a.setGreenF(green); I_a.setBlueF(blue);
 

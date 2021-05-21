@@ -24,7 +24,6 @@ private:
 	QMessageBox msgBox;
 
 	Octahedron octahedron;
-	//QList<QVector<QPointF>> projectedCoordinates;
 	Projection3D camera;
 	PointLightSource lightSource;
 	CoeficientsPOM coeficientsPOM;

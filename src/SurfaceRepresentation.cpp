@@ -160,7 +160,7 @@ void Octahedron::clear()
 void Octahedron::calculateNormals()
 {
 	Vertex* vertex1 = nullptr, * vertex2 = nullptr, * vertex3 = nullptr;
-	Vector faceNormal{ 0.0,0.0,0.0 };
+	QVector3D faceNormal(0.0, 0.0, 0.0);
 
 	// normlay vo vrcholoch, tie nedelim normou, lebo uz su na jedntkovej sfere -> maju normu == 1
 	for (int i = 0; i < vertices.size(); i++)
@@ -176,7 +176,7 @@ void Octahedron::calculateNormals()
 		vertex3 = faces[i]->getEdge()->getEdgePrevious()->getVertexOrigin();
 
 		faceNormal = (vertex1->getVertexNormal() + vertex2->getVertexNormal() + vertex3->getVertexNormal()) / 3.0;
-		faceNormal = faceNormal / norm(faceNormal); // normalizovanie vektoru normaly na plosku
+		faceNormal.normalize(); // normalizovanie vektoru normaly na plosku
 
 		faces[i]->setFaceNormal(faceNormal);
 	}

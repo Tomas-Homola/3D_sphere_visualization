@@ -1,26 +1,6 @@
 #pragma once
 #include "qcolor.h"
 
-struct Vector
-{
-	double x;
-	double y;
-	double z;
-
-	void operator*=(double scalar);
-	void operator+=(const Vector v);
-	void operator-=(const Vector v);
-
-	Vector operator+(const Vector v);
-	Vector operator-(const Vector v);
-	Vector operator*(double scalar);
-	Vector operator/(double scalar);
-};
-
-QString infoVector(Vector v, int precision = 6);
-double dotProduct(Vector v1, Vector v2);
-double norm(Vector v);
-
 struct PointLightSource
 {
 	double x;

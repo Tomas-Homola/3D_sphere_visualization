@@ -581,6 +581,7 @@ void ViewerWidget::fillPolygonScanLineAlgorithm(QVector<QPointF> polygonPoints, 
 
 	y = yMin;
 
+	//##### mozno tu je chybicka #####//
 	TH.resize(yMax - yMin + 1); // ked tam nebolo trochu vacsie, padalo to pri orezavani
 
 	for (int i = 0; i < polygonEdges.size(); i++) // priprava TH
