@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1331</width>
+    <width>1376</width>
     <height>761</height>
    </rect>
   </property>
@@ -521,13 +521,13 @@
      <widget class="QGroupBox" name="groupBox_ShadingAndLight">
       <property name="minimumSize">
        <size>
-        <width>300</width>
+        <width>310</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>300</width>
+        <width>310</width>
         <height>16777215</height>
        </size>
       </property>
@@ -628,10 +628,10 @@
           <item row="0" column="1">
            <widget class="QSlider" name="horizontalSlider_LightX">
             <property name="minimum">
-             <number>-20</number>
+             <number>-100</number>
             </property>
             <property name="maximum">
-             <number>20</number>
+             <number>100</number>
             </property>
             <property name="value">
              <number>5</number>
@@ -647,10 +647,10 @@
           <item row="1" column="1">
            <widget class="QSlider" name="horizontalSlider_LightY">
             <property name="minimum">
-             <number>-20</number>
+             <number>-100</number>
             </property>
             <property name="maximum">
-             <number>20</number>
+             <number>100</number>
             </property>
             <property name="value">
              <number>5</number>
@@ -666,10 +666,10 @@
           <item row="2" column="1">
            <widget class="QSlider" name="horizontalSlider_LightZ">
             <property name="minimum">
-             <number>-20</number>
+             <number>-100</number>
             </property>
             <property name="maximum">
-             <number>20</number>
+             <number>100</number>
             </property>
             <property name="value">
              <number>5</number>
@@ -932,7 +932,7 @@
              <double>0.010000000000000</double>
             </property>
             <property name="value">
-             <double>0.000000000000000</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -953,7 +953,7 @@
              <double>0.010000000000000</double>
             </property>
             <property name="value">
-             <double>0.000000000000000</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -998,7 +998,7 @@
              <double>0.010000000000000</double>
             </property>
             <property name="value">
-             <double>0.000000000000000</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -1056,6 +1056,15 @@
               <weight>75</weight>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -1148,7 +1157,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1331</width>
+     <width>1376</width>
      <height>23</height>
     </rect>
    </property>

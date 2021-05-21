@@ -76,7 +76,7 @@ private:
 	QColor getNearestNeighborColor(QVector<QPointF> trianglePoints, QList<QColor> colors, QPoint currentPoint);
 	QColor getBarycentricColor(QVector<QPointF> T, QList<QColor> colors, QPoint P);
 	QColor getBarycentricDistanceColor(QVector<QPointF> T, QPoint P);
-	double interpolateZ(QVector<QPointF> T, QPoint P, double* zCoors);
+	double interpolateZ(QVector<QPointF> T, QPoint P, double* zCoords);
 
 	// kreslenie, orezavanie, vyfarbovanie
 	void drawBresenhamChosenX(QPoint point1, QPoint point2, QColor color);

@@ -255,10 +255,19 @@ QColor ViewerWidget::getBarycentricDistanceColor(QVector<QPointF> T, QPoint P)
 	return outputColor;
 }
 
-double ViewerWidget::interpolateZ(QVector<QPointF> T, QPoint P, double* zCoors)
+double ViewerWidget::interpolateZ(QVector<QPointF> T, QPoint P, double* zCoords)
 {
 	double interpolatedZ = 0.0;
+	double lambda0 = 0.0, lambda1 = 0.0, lambda2 = 0.0;
 
+	lambda0 = qAbs((T[1].x() - (double)P.x()) * (T[2].y() - (double)P.y()) - (T[1].y() - (double)P.y()) * (T[2].x() - (double)P.x())) / qAbs((T[1].x() - T[0].x()) * (T[2].y() - T[0].y()) - (T[1].y() - T[0].y()) * (T[2].x() - T[0].x()));
+
+	lambda1 = qAbs((T[0].x() - (double)P.x()) * (T[2].y() - (double)P.y()) - (T[0].y() - (double)P.y()) * (T[2].x() - (double)P.x())) / qAbs((T[1].x() - T[0].x()) * (T[2].y() - T[0].y()) - (T[1].y() - T[0].y()) * (T[2].x() - T[0].x()));
+
+	lambda2 = 1.0 - lambda0 - lambda1;
+
+	//interpolatedZ = lambda0 * zCoords[0] + lambda1 * zCoords[1] + lambda2 * zCoords[2];
+	interpolatedZ = (zCoords[0] * zCoords[1] * zCoords[2]) / (lambda0 * zCoords[1] * zCoords[2] + lambda1 * zCoords[0] * zCoords[2] * lambda2 * zCoords[0] * zCoords[1]);
 	
 	return interpolatedZ;
 }
@@ -636,7 +645,7 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 	//qDebug() << "triangle scanLine";
 	QPointF P(-1, -1);
 	QPointF e1[2], e2[2], e3[2], e4[2];
-	double m = 0.0, w1 = 0.0, w2 = 0.0, w3 = 0.0, w4 = 0.0, x1 = 0.0, x2 = 0.0;
+	double m = 0.0, w1 = 0.0, w2 = 0.0, w3 = 0.0, w4 = 0.0, x1 = 0.0, x2 = 0.0, interpolatedZ = 0.0;
 	int y = 0, yMax = 0, deltaX = 0; int Px = 0;
 
 	//printPoints(T);
@@ -712,11 +721,35 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 		{
 			if (interpolationMethod == NearestNeighbor)
 			{
-				setPixel(static_cast<int>(x1 + 0.5) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+				interpolatedZ = interpolateZ(T, QPoint(static_cast<int>(x1 + 0.5) + i, y), zCoords);
+
+				if (zBuffer[static_cast<int>(x1 + 0.5) + i][y] < interpolatedZ)
+				{
+					zBuffer[static_cast<int>(x1 + 0.5) + i][y] = interpolatedZ;
+					
+					setPixel(static_cast<int>(x1 + 0.5) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+				}
+				else
+				{
+					setPixel(static_cast<int>(x1 + 0.5) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+				}
+				
 			}
 			else if (interpolationMethod == Barycentric1)
 			{
-				setPixel(static_cast<int>(x1 + 0.5) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+				interpolatedZ = interpolateZ(T, QPoint(static_cast<int>(x1 + 0.5) + i, y), zCoords);
+
+				if (zBuffer[static_cast<int>(x1 + 0.5) + i][y] < interpolatedZ)
+				{
+					zBuffer[static_cast<int>(x1 + 0.5) + i][y] = interpolatedZ;
+
+					setPixel(static_cast<int>(x1 + 0.5) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+				}
+				else
+				{
+					setPixel(static_cast<int>(x1 + 0.5) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+				}
+				
 			}
 		}
 
@@ -739,11 +772,33 @@ void ViewerWidget::fillTriangleScanLine(QVector<QPointF> T, QList<QColor> colors
 			{
 				if (interpolationMethod == NearestNeighbor)
 				{
-					setPixel(static_cast<int>(x1) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1) + i, y)));
+					interpolatedZ = interpolateZ(T, QPoint(static_cast<int>(x1 + 0.5) + i, y), zCoords);
+
+					if (zBuffer[static_cast<int>(x1 + 0.5) + i][y] < interpolatedZ)
+					{
+						zBuffer[static_cast<int>(x1 + 0.5) + i][y] = interpolatedZ;
+
+						setPixel(static_cast<int>(x1 + 0.5) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+					}
+					else
+					{
+						setPixel(static_cast<int>(x1 + 0.5) + i, y, getNearestNeighborColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+					}
 				}
 				else if (interpolationMethod == Barycentric1)
 				{
-					setPixel(static_cast<int>(x1) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1) + i, y)));
+					interpolatedZ = interpolateZ(T, QPoint(static_cast<int>(x1 + 0.5) + i, y), zCoords);
+
+					if (zBuffer[static_cast<int>(x1 + 0.5) + i][y] < interpolatedZ)
+					{
+						zBuffer[static_cast<int>(x1 + 0.5) + i][y] = interpolatedZ;
+
+						setPixel(static_cast<int>(x1 + 0.5) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+					}
+					else
+					{
+						setPixel(static_cast<int>(x1 + 0.5) + i, y, getBarycentricColor(T, colors, QPoint(static_cast<int>(x1 + 0.5) + i, y)));
+					}
 				}
 			}
 
